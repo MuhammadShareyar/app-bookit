@@ -5,22 +5,12 @@ import Link from "next/link";
 import logo from "@/assets/images/logo.svg";
 import { FaUser, FaSignInAlt, FaSignOutAlt, FaBuilding } from "react-icons/fa";
 import destroyAuthSession from "@/app/actions/destroyAuthSession";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import checkAuth from "@/app/actions/checkAuth";
+import { useAuth } from "@/context/AuthContext";
 
 const Header = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-
-  useEffect(() => {
-    const fetchAuthStatus = async () => {
-      const result = await checkAuth();
-      setIsAuthenticated(result.isAuthenticated);
-    };
-
-    fetchAuthStatus();
-  }, []);
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
 
   const router = useRouter();
 
@@ -28,6 +18,7 @@ const Header = () => {
     const { success, error, message } = await destroyAuthSession();
 
     if (success) {
+      setIsAuthenticated(false);
       router.push("/login");
     } else {
       toast.error(message);
